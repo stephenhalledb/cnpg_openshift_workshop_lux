@@ -9,6 +9,8 @@ echo "03b" > ./docs/docid
 # Requirements: cert-manager, and the plugin must run in the namespace of the
 # operator (openshift-operators with the OLM install of 02_install_cnpg_operator.sh).
 # The release manifest is made for cnpg-system, so its namespace is replaced.
+# It also pins runAsUser/runAsGroup 10001, which the OpenShift restricted-v2 SCC
+# rejects (the UID must be in the range of the namespace): those two lines are removed.
 
 operator_namespace="openshift-operators"
 plugin_deployment="barman-cloud"
@@ -87,9 +89,10 @@ if [ ${cert_ok} -ne 0 ]; then
 fi
 
 if [ ${plugin_ok} -ne 0 ]; then
-  print_command "curl -sL ${plugin_manifest_url} | sed 's/namespace: cnpg-system/namespace: ${operator_namespace}/' | oc apply -f -\n"
+  print_command "curl -sL ${plugin_manifest_url} | sed (namespace, runAsUser/runAsGroup) | oc apply -f -\n"
   curl -sSfL ${plugin_manifest_url} \
-    | sed "s/namespace: cnpg-system/namespace: ${operator_namespace}/" \
+    | sed -e "s/namespace: cnpg-system/namespace: ${operator_namespace}/" \
+          -e '/runAsUser: 10001/d' -e '/runAsGroup: 10001/d' \
     | ${kubectl_cmd} apply -f - || exit 1
   print_info "Waiting for the plugin to be ready...\n"
   wait_for check_plugin
