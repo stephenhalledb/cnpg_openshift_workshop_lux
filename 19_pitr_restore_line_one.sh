@@ -26,6 +26,11 @@ spec:
       recoveryTarget:
         targetTime: '${pitr_date%?}'
         #backupID: 20230411T115526
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: ${objectstore_name}
   externalClusters:
     - name: ${cluster_name}
       plugin:

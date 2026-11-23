@@ -29,6 +29,15 @@ $affinity
       memory: "$postgres_memory_max"
       cpu: "$postgres_cpu_max"
 
+  # The restored cluster archives its own WALs and backups in the same bucket, in the
+  # folder of its own name (serverName defaults to the cluster name, so the source
+  # cluster folder is not overwritten)
+  plugins:
+  - name: barman-cloud.cloudnative-pg.io
+    isWALArchiver: true
+    parameters:
+      barmanObjectName: ${objectstore_name}
+
   # Recovery from the object store with the Barman Cloud Plugin. serverName is the
   # folder of the source cluster in the bucket (default of the plugin: its name)
   externalClusters:
