@@ -11,8 +11,10 @@ echo "03b" > ./docs/docid
 # The release manifest is made for cnpg-system, so its namespace is replaced.
 # It also pins runAsUser/runAsGroup 10001, which the OpenShift restricted-v2 SCC
 # rejects (the UID must be in the range of the namespace): those two lines are removed.
+# Its rights are only for postgresql.cnpg.io: yaml/barman-plugin-edb-rbac.yaml adds them
+# for the EDB API group postgresql.k8s.enterprisedb.io.
 
-operator_namespace="openshift-operators"
+export operator_namespace="openshift-operators"   # exported: used by envsubst
 plugin_deployment="barman-cloud"
 plugin_manifest_url="https://github.com/cloudnative-pg/plugin-barman-cloud/releases/download/${barman_cloud_plugin_version}/manifest.yaml"
 cert_manager_manifest_url="https://github.com/cert-manager/cert-manager/releases/download/${cert_manager_version}/cert-manager.yaml"
@@ -55,19 +57,43 @@ check_plugin() {
   return 0
 }
 
+# The plugin only has rights on the postgresql.cnpg.io API group, the EDB operator
+# uses postgresql.k8s.enterprisedb.io: grant the same rights (see the yaml file).
+# Returns 0 if the rights exist (or were created), 1 if not.
+rbac_yaml="./yaml/barman-plugin-edb-rbac.yaml"
+check_edb_rbac() {
+  if ${kubectl_cmd} get clusterrole plugin-barman-cloud-edb >/dev/null 2>&1 \
+     && ${kubectl_cmd} get clusterrolebinding plugin-barman-cloud-edb >/dev/null 2>&1; then
+    print_info "Plugin rights on postgresql.k8s.enterprisedb.io: EXIST\n"
+    return 0
+  fi
+  print_error "Plugin rights on postgresql.k8s.enterprisedb.io: MISSING (the cluster cannot use the plugin)\n"
+  return 1
+}
+apply_edb_rbac() {
+  check_edb_rbac >/dev/null && return 0
+  print_command "envsubst < ${rbac_yaml} | oc apply -f -\n"
+  envsubst < ${rbac_yaml} | ${kubectl_cmd} apply -f - || return 1
+  check_edb_rbac
+}
+
 print_command "oc get crd certificates.cert-manager.io; oc get deploy ${plugin_deployment} -n ${operator_namespace}\n"
 check_cert_manager
 cert_ok=$?
 check_plugin
 plugin_ok=$?
 
-if [ ${cert_ok} -eq 0 ] && [ ${plugin_ok} -eq 0 ]; then
+if [ "${plugin_operator_minio_managed_by_admin}" == "yes" ]; then
+  check_edb_rbac
+  if [ ${cert_ok} -ne 0 ] || [ ${plugin_ok} -ne 0 ]; then
+    print_warning "Install skipped (managed by the administrator): plugin_operator_minio_managed_by_admin=${plugin_operator_minio_managed_by_admin} in config.sh\n"
+  fi
   exit 0
 fi
 
-if [ "${plugin_operator_minio_managed_by_admin}" == "yes" ]; then
-  print_warning "Install skipped (managed by the administrator): plugin_operator_minio_managed_by_admin=${plugin_operator_minio_managed_by_admin} in config.sh\n"
-  exit 0
+if [ ${cert_ok} -eq 0 ] && [ ${plugin_ok} -eq 0 ]; then
+  apply_edb_rbac
+  exit $?
 fi
 
 # Wait up to 3 minutes until the given check function succeeds
@@ -98,3 +124,5 @@ if [ ${plugin_ok} -ne 0 ]; then
   wait_for check_plugin
   check_plugin || exit 1
 fi
+
+apply_edb_rbac || exit 1
