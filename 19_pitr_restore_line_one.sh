@@ -8,6 +8,10 @@ echo "19" > ./docs/docid
 pitr_date=$(${kubectl_cmd} exec -it ${primary} -- psql -U postgres -X -A -t -c "select min(timestamp+interval '1 second') from test;") 
 print_info "Restore date: ${red}${pitr_date%?}\n"
 
+# Folder of the restore cluster in the bucket: unique for each restore (the plugin
+# refuses to archive in a folder that already contains WALs)
+export restore_server_name="${cluster_restore}-$(date +%Y%m%d-%H%M%S)"
+
 cat > ./pitr/restore-cluster.yaml <<EOF
 apiVersion: postgresql.k8s.enterprisedb.io/v1
 kind: Cluster
@@ -31,6 +35,7 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: ${objectstore_name}
+        serverName: ${restore_server_name}
   externalClusters:
     - name: ${cluster_name}
       plugin:
