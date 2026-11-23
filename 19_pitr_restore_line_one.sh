@@ -8,7 +8,7 @@ echo "19" > ./docs/docid
 pitr_date=$(${kubectl_cmd} exec -it ${primary} -- psql -U postgres -X -A -t -c "select min(timestamp+interval '1 second') from test;") 
 print_info "Restore date: ${red}${pitr_date%?}\n"
 
-cat > ./pitr/restore_cluster.yaml <<EOF
+cat > ./pitr/restore-cluster.yaml <<EOF
 apiVersion: postgresql.k8s.enterprisedb.io/v1
 kind: Cluster
 metadata:
@@ -45,8 +45,8 @@ ${kubectl_cmd} delete cluster.postgresql.k8s.enterprisedb.io ${cluster_restore}
 sleep 5
 ${kubectl_cmd} exec -it ${primary} -- psql -U postgres -c "select pg_switch_wal();"
 sleep 5
-#${kubectl_cmd} apply -f ./pitr/restore_cluster.yaml
-envsubst < ./pitr/restore_cluster.yaml | ${kubectl_cmd} apply -n ${namespace} -f-
+#${kubectl_cmd} apply -f ./pitr/restore-cluster.yaml
+envsubst < ./pitr/restore-cluster.yaml | ${kubectl_cmd} apply -n ${namespace} -f-
 
 print_info "/!\ Verify that only the first record will be restored in the new cluster${reset}\n"
 print_info "/!\ Please, wait 60 seconds\n"
