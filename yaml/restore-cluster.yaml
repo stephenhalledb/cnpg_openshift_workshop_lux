@@ -29,17 +29,16 @@ $affinity
       memory: "$postgres_memory_max"
       cpu: "$postgres_cpu_max"
 
-  # The restored cluster archives its own WALs in the same bucket. The folder
-  # (serverName) is unique for each restore: the plugin refuses to archive in a
-  # folder that already contains WALs ("Expected empty archive"), which would
-  # happen when the restore cluster is deleted and created again with the same name.
-  # It must not be the folder of the source cluster either.
+  # The restored cluster archives its own WALs in the same bucket, in the folder of its
+  # own name (serverName defaults to the cluster name; the folder of the source cluster
+  # is not touched). The plugin refuses to archive in a folder that already contains
+  # WALs: delete_restore_archive.sh empties it (used by 19_pitr_restore_line_one.sh)
+  # before the cluster is created again.
   plugins:
   - name: barman-cloud.cloudnative-pg.io
     isWALArchiver: true
     parameters:
       barmanObjectName: ${objectstore_name}
-      serverName: ${restore_server_name}
 
   # Recovery from the object store with the Barman Cloud Plugin. serverName is the
   # folder of the source cluster in the bucket (default of the plugin: its name)

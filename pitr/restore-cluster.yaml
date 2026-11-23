@@ -20,7 +20,6 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: cluster-sh-objectstore
-        serverName: cluster-restore-sh-20261123-210856
   externalClusters:
     - name: cluster-sh
       plugin:

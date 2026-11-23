@@ -249,6 +249,7 @@ One script. Without a parameter it shows the current number of instances and ask
 18_pitr_insert_new_line.sh
 19_pitr_restore_line_one.sh
 ```
+`19_pitr_restore_line_one.sh` deletes the restore cluster (`cluster_restore`, the name does not change), waits until its pods are gone, deletes its WAL archive in the S3 storage (`delete_restore_archive.sh`: only the folder `s3://<bucket>/<cluster_restore>/`, never the one of `cluster_name`; needs the `aws` CLI) and creates the cluster again from the `cluster_name` archive up to the recovery target. The archive must be deleted because the Barman Cloud Plugin refuses to archive in a folder that already contains WALs (`Expected empty archive`).
 # Major Upgrade
 By copy (creates a new cluster with the new version) and in place:
 ```
