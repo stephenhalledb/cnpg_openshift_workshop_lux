@@ -1,0 +1,32 @@
+apiVersion: postgresql.k8s.enterprisedb.io/v1
+kind: Cluster
+metadata:
+  name: 'cluster-restore-sh'
+spec:
+  instances: 1
+  imageName: 'docker.enterprisedb.com/k8s/postgresql:17.7'
+
+  storage:
+    size: 512Mi
+
+  bootstrap:
+    recovery:
+      source: cluster-sh
+      recoveryTarget:
+        targetTime: '2026-11-18 23:26:59.370186'
+        #backupID: 20230411T115526
+  externalClusters:
+    - name: cluster-sh
+      barmanObjectStore:
+        destinationPath: "s3://backups/"
+        endpointURL: "http://minio-service.minio-system.svc.cluster.local:9000"
+        s3Credentials:
+          accessKeyId:
+            name: minio-creds
+            key: ACCESS_KEY_ID
+          secretAccessKey:
+            name: minio-creds
+            key: ACCESS_SECRET_KEY
+      data:
+        immediateCheckpoint: true
+      retentionPolicy: "1d"

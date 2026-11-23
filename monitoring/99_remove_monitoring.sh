@@ -1,3 +1,7 @@
+# WARNING: do not run this on OpenShift/CRC. It deletes the Prometheus CRDs (prometheuses,
+# servicemonitors, ...) that the OpenShift monitoring stack needs. On OpenShift use
+# 06_openshift_monitoring.sh with enable_prometheus_monitoring in ../config.sh.
+
 kubectl delete -f https://raw.githubusercontent.com/EnterpriseDB/docs/main/product_docs/docs/postgres_for_kubernetes/1/samples/monitoring/grafana-configmap.yaml
 kubectl delete -f https://raw.githubusercontent.com/EnterpriseDB/docs/main/product_docs/docs/postgres_for_kubernetes/1/samples/monitoring/prometheusrule.yaml
 sleep 2

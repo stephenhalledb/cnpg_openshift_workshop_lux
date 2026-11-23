@@ -11,8 +11,8 @@ metadata:
   namespace: minio-system
 type: Opaque
 stringData:
-  MINIO_ROOT_USER: "minio"
-  MINIO_ROOT_PASSWORD: "edb-workshop"
+  MINIO_ROOT_USER: "${ACCESS_KEY_ID}"
+  MINIO_ROOT_PASSWORD: "${ACCESS_SECRET_KEY}"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -45,7 +45,7 @@ spec:
     spec:
       containers:
       - name: minio
-        image: quay.io/minio/minio:latest
+        image: cgr.dev/chainguard/minio:latest
         args:
         - server
         - /data
@@ -54,6 +54,12 @@ spec:
         envFrom:
         - secretRef:
             name: minio-creds
+        resources:
+          requests:
+            cpu: 20m
+            memory: 100Mi
+          limits:
+            memory: 1Gi
         ports:
         - containerPort: 9000
           name: api
@@ -114,3 +120,32 @@ spec:
   tls:
     termination: edge
     insecureEdgeTerminationPolicy: Redirect
+---
+# Creates the bucket used by the CNPG backups
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-create-bucket
+  namespace: minio-system
+spec:
+  backoffLimit: 10
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: mc
+        image: cgr.dev/chainguard/minio-client:latest
+        command:
+        - mc
+        envFrom:
+        - secretRef:
+            name: minio-creds
+        args:
+        - --config-dir
+        - /tmp/.mc
+        - mb
+        - --ignore-existing
+        - local/${S3_bucket_name}
+        env:
+        - name: MC_HOST_local
+          value: http://$(MINIO_ROOT_USER):$(MINIO_ROOT_PASSWORD)@minio-service:9000

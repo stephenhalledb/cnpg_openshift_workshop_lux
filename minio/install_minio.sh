@@ -1,29 +1,26 @@
 #!/bin/bash
+# Installs a single-pod MinIO (no operator) in the namespace minio-system.
+# User, password and bucket name (S3_bucket_name) are taken from ../config.sh
 . ../config.sh
 
-${kubectl_cmd} create secret generic backup-secret \
-  --from-literal=ACCESS_KEY_ID=minio \
-  --from-literal=ACCESS_SECRET_KEY=minio123
+minio_namespace="minio-system"
 
-${kubectl_cmd} create namespace minio-tenant
-${kubectl_cmd} create namespace minio-operator
-sleep 1
-${kubectl_cmd} apply -f subscription.yaml
-sleep 90
-${kubectl_cmd} get deploy -A | grep -E "minio|NAMESPACE"
-sleep 5
-${kubectl_cmd} apply -f tenant.yaml
-sleep 3
-${kubectl_cmd} apply -f storage-configuration.yaml
-${kubectl_cmd} apply -f storage-user.yaml
-sleep 3
+# The Job spec is immutable, remove a previous one so the script can be re-run
+${kubectl_cmd} delete job minio-create-bucket -n ${minio_namespace} --ignore-not-found
 
-${kubectl_cmd} apply -f minio_route.yaml
-${kubectl_cmd} apply -f minio_client_route.yaml
-${kubectl_cmd} apply -f backup-secrets.yaml
-sleep 20
-printf "Console: https://minio-console-minio-tenant.apps-crc.testing/login\n"
-printf "Console: https://minio-console-minio-operator.apps-crc.testing/login\n"
-printf "User: minio\n"
-printf "Password: minio123\n"
+envsubst '${ACCESS_KEY_ID} ${ACCESS_SECRET_KEY} ${S3_bucket_name}' < minio.yaml | ${kubectl_cmd} apply -f - || exit 1
 
+${kubectl_cmd} rollout status deployment/minio -n ${minio_namespace} --timeout=300s || exit 1
+${kubectl_cmd} wait --for=condition=complete job/minio-create-bucket -n ${minio_namespace} --timeout=300s || exit 1
+
+console=$(${kubectl_cmd} get route minio-console -n ${minio_namespace} -o jsonpath='{.spec.host}')
+api=$(${kubectl_cmd} get route minio-api -n ${minio_namespace} -o jsonpath='{.spec.host}')
+
+printf "\nMinIO is ready\n"
+printf "Console  : https://${console}\n"
+printf "S3 API   : https://${api} (outside the cluster)\n"
+printf "In-cluster endpoint for config.sh (s3_endpoint_url, no TLS needed):\n"
+printf "  export s3_endpoint_url=\"http://minio-service.${minio_namespace}.svc.cluster.local:9000\"\n"
+printf "Bucket   : ${S3_bucket_name}\n"
+printf "User     : ${ACCESS_KEY_ID}\n"
+printf "Password : ${ACCESS_SECRET_KEY}\n"
