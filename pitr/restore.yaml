@@ -17,16 +17,8 @@ spec:
         #backupID: 20230411T115526
   externalClusters:
     - name: cluster-sh
-      barmanObjectStore:
-        destinationPath: "s3://backups/"
-        endpointURL: "http://minio-service.minio-system.svc.cluster.local:9000"
-        s3Credentials:
-          accessKeyId:
-            name: minio-creds
-            key: ACCESS_KEY_ID
-          secretAccessKey:
-            name: minio-creds
-            key: ACCESS_SECRET_KEY
-      data:
-        immediateCheckpoint: true
-      retentionPolicy: "1d"
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: cluster-sh-objectstore
+          serverName: cluster-sh

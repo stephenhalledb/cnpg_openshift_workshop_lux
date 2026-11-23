@@ -28,47 +28,12 @@ spec:
         #backupID: 20230411T115526
   externalClusters:
     - name: ${cluster_name}
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: ${objectstore_name}
+          serverName: ${cluster_name}
 EOF
-
-if [[ "$object_storage_type" = "aws" ]]; then
-cat >> ./pitr/restore.yaml <<EOF
-      barmanObjectStore:
-        destinationPath: "$s3_destination_path"
-        s3Credentials:
-          accessKeyId:
-            name: minio-creds
-            key: ACCESS_KEY_ID
-          secretAccessKey:
-            name: minio-creds
-            key: ACCESS_SECRET_KEY
-          sessionToken:
-            name: minio-creds
-            key: ACCESS_SESSION_TOKEN
-      data:
-        immediateCheckpoint: true
-      wal:
-        compression: gzip
-        maxParallel: 8
-        encryption: AES256
-      retentionPolicy: "1d"
-EOF
-elif [[ "$object_storage_type" = "minio" ]]; then
-cat >> ./pitr/restore.yaml <<EOF
-      barmanObjectStore:
-        destinationPath: "$s3_destination_path"
-        endpointURL: "$s3_endpoint_url"
-        s3Credentials:
-          accessKeyId:
-            name: minio-creds
-            key: ACCESS_KEY_ID
-          secretAccessKey:
-            name: minio-creds
-            key: ACCESS_SECRET_KEY
-      data:
-        immediateCheckpoint: true
-      retentionPolicy: "1d"
-EOF
-fi
 
 print_info "Deleting cluster-restore cluster.postgresql.k8s.enterprisedb.io\n"
 ${kubectl_cmd} delete cluster.postgresql.k8s.enterprisedb.io ${cluster_restore}

@@ -19,8 +19,7 @@ $affinity
 
   bootstrap:
     recovery:
-      backup:
-        name: ${cluster_name}-backup-test
+      source: ${cluster_name}
 
   resources:
     requests:
@@ -30,3 +29,12 @@ $affinity
       memory: "$postgres_memory_max"
       cpu: "$postgres_cpu_max"
 
+  # Recovery from the object store with the Barman Cloud Plugin. serverName is the
+  # folder of the source cluster in the bucket (default of the plugin: its name)
+  externalClusters:
+  - name: ${cluster_name}
+    plugin:
+      name: barman-cloud.cloudnative-pg.io
+      parameters:
+        barmanObjectName: ${objectstore_name}
+        serverName: ${cluster_name}

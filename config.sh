@@ -177,6 +177,13 @@ export epas_storage="512Mi"
 export object_storage_bucket="${S3_bucket_name}"
 export s3_destination_path="s3://${S3_bucket_name}/"
 
+# --- Barman Cloud Plugin -----------------------------------------------------
+# Backups and WAL archiving of the clusters use the Barman Cloud Plugin
+# (installed by 03b_install_barman_cloud_plugin.sh, needs cert-manager).
+export barman_cloud_plugin_version="v0.16.0"
+export cert_manager_version="v1.21.3"
+export objectstore_name="${cluster_name}-objectstore"   # ObjectStore resource (bucket settings)
+
 ## S3
 #export object_storage_bucket="${S3_bucket_name}"
 #export s3_destination_path="s3://${S3_bucket_name}/"

@@ -47,24 +47,10 @@ $affinity
       memory: "$postgres_memory_max"
       cpu: "$postgres_cpu_max"
 
-  backup:
-    barmanObjectStore:
-      destinationPath: "$s3_destination_path"
-      s3Credentials:
-        accessKeyId:
-          name: minio-creds
-          key: ACCESS_KEY_ID
-        secretAccessKey:
-          name: minio-creds
-          key: ACCESS_SECRET_KEY
-        sessionToken:
-          name: minio-creds
-          key: ACCESS_SESSION_TOKEN
-      data:
-        immediateCheckpoint: true
-      wal:
-        compression: gzip
-        maxParallel: 8
-        encryption: AES256
-    retentionPolicy: "1d"
-
+  # Backups and WAL archiving: Barman Cloud Plugin, the bucket is defined by the
+  # ObjectStore ${objectstore_name} (yaml/objectstore*.yaml)
+  plugins:
+  - name: barman-cloud.cloudnative-pg.io
+    isWALArchiver: true
+    parameters:
+      barmanObjectName: ${objectstore_name}
