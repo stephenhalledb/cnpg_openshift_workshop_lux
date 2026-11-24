@@ -13,7 +13,7 @@ spec:
     recovery:
       source: cluster-sh
       recoveryTarget:
-        targetTime: '2026-11-23 20:05:19.05901'
+        targetTime: '2026-11-23 20:05:19.059017'
         #backupID: 20230411T115526
   plugins:
     - name: barman-cloud.cloudnative-pg.io
