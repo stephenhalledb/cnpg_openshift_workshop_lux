@@ -44,8 +44,8 @@ wait_for_hibernated() {
 }
 
 # Without a parameter, ask in the terminal: a) hibernate or b) resume
-#   ./23_hibernation.sh        : asks
-#   ./23_hibernation.sh on|off : does not ask (on = hibernate, off = resume)
+#   ./33_hibernation.sh        : asks
+#   ./33_hibernation.sh on|off : does not ask (on = hibernate, off = resume)
 i=$1
 while [ -z "$i" ]; do
   printf "Cluster ${cluster_name}:\n"

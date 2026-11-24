@@ -3,7 +3,7 @@
 # WALs) from the S3 storage: s3://<bucket>/<cluster_restore>/
 # Why: the Barman Cloud Plugin refuses to archive in a folder that already contains
 # WALs ("Expected empty archive"), so the archive must be removed when the restore
-# cluster is deleted and created again with the same name (19_pitr_restore_line_one.sh).
+# cluster is deleted and created again with the same name (29_pitr_restore_line_one.sh).
 # Run it only when the restore cluster is deleted: a running cluster would archive again.
 # Only the folder of ${cluster_restore} is deleted, never the archive of ${cluster_name}.
 # Exit code: 0 = deleted (or nothing to delete), 1 = error.
@@ -25,7 +25,7 @@ export AWS_EC2_METADATA_DISABLED=true PYTHONWARNINGS=ignore
 args=()
 
 if [ "${object_storage_type}" == "minio" ]; then
-  # Same access as 00_setup_S3_storage.sh: the route of the MinIO API
+  # Same access as 01_setup_S3_storage.sh: the route of the MinIO API
   host=$(${kubectl_cmd} get route minio-api -n minio-system -o jsonpath='{.spec.host}' 2>/dev/null)
   if [ -z "${host}" ]; then
     print_error "Route minio-api not found in minio-system, cannot reach MinIO\n"

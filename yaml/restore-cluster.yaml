@@ -32,7 +32,7 @@ $affinity
   # The restored cluster archives its own WALs in the same bucket, in the folder of its
   # own name (serverName defaults to the cluster name; the folder of the source cluster
   # is not touched). The plugin refuses to archive in a folder that already contains
-  # WALs: delete_restore_archive.sh empties it (used by 19_pitr_restore_line_one.sh)
+  # WALs: delete_restore_archive.sh empties it (used by 29_pitr_restore_line_one.sh)
   # before the cluster is created again.
   plugins:
   - name: barman-cloud.cloudnative-pg.io

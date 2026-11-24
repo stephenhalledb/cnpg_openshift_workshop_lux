@@ -15,7 +15,7 @@ fi
 . ./create_namespace.sh
 
 # ObjectStore of the Barman Cloud Plugin (bucket settings for backups and WALs),
-# it must exist before the cluster. Needs the minio-creds secret (04-prepare-cluster.sh).
+# it must exist before the cluster. Needs the minio-creds secret (06_prepare_cluster.sh).
 objectstore_yaml="./yaml/objectstore.yaml"
 [ "${object_storage_type}" == "aws" ] && objectstore_yaml="./yaml/objectstore-aws.yaml"
 print_command "${kubectl_cmd} apply -n ${namespace} -f ${objectstore_yaml}\n"

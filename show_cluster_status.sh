@@ -1,5 +1,5 @@
 #!/bin/bash
-# Like 06_show_status.sh, but it asks which Postgres cluster to display.
+# Like 11_show_status.sh, but it asks which Postgres cluster to display.
 # It lists the clusters of the default namespace (the current oc project; the
 # namespace from config.sh if no project is selected) and shows the status of
 # the chosen one, refreshed every second (quit with Ctrl+C).

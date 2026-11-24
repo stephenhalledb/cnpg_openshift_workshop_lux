@@ -6,8 +6,8 @@ source ./replica.sh
 echo "30" > ./docs/docid
 
 # Without a parameter, ask in the terminal: a) fence or b) unfence
-#   ./22_fencing.sh        : asks
-#   ./22_fencing.sh on|off : does not ask (on = fence, off = unfence)
+#   ./32_fencing.sh        : asks
+#   ./32_fencing.sh on|off : does not ask (on = fence, off = unfence)
 i=$1
 while [ -z "$i" ]; do
   printf "Instance ${replica} of cluster ${cluster_name}:\n"

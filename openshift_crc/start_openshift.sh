@@ -47,7 +47,7 @@ echo "eval $(crc oc-env)"
 echo "oc login -u kubeadmin https://api.crc.testing:6443"
 echo ""
 if [ "${cluster_monitoring}" == "true" ]; then
-  echo "Cluster monitoring is ON. After 04-prepare-cluster.sh, 05_install_cluster.sh enables"
+  echo "Cluster monitoring is ON. After 06_prepare_cluster.sh, 10_install_cluster.sh enables"
   echo "the monitoring of the Postgres clusters (monitoring/06_openshift_monitoring.sh)."
   echo ""
 fi

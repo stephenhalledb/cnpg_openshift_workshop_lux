@@ -1,10 +1,10 @@
 #!/bin/bash
 # Checks the data of the restored cluster (cluster_restore).
-# The restore (12_restore_cluster.sh) takes a few minutes: the cluster has to
+# The restore (22_restore_cluster.sh) takes a few minutes: the cluster has to
 # fetch the backup and the WAL files from the object storage first. This script
 # waits until the restore cluster is up and running, and prints a message while
 # it waits. It stops with an error if the cluster does not exist (run
-# 12_restore_cluster.sh first) or is not ready after the timeout.
+# 22_restore_cluster.sh first) or is not ready after the timeout.
 # Timeout in seconds: RESTORE_WAIT_TIMEOUT (default 600).
 
 source ./config.sh
@@ -28,7 +28,7 @@ wait_for_restore_cluster() {
 
   if ! ${kubectl_cmd} get ${restore_cluster_resource} ${cluster_restore} -n ${namespace} >/dev/null 2>&1; then
     print_error "Restore cluster ${cluster_restore} not found in namespace ${namespace}.\n"
-    print_error "Run ./12_restore_cluster.sh first (or check that you are logged in: oc whoami).\n"
+    print_error "Run ./22_restore_cluster.sh first (or check that you are logged in: oc whoami).\n"
     return 1
   fi
 

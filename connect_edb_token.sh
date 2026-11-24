@@ -6,7 +6,7 @@
 #      needs it to pull its image, without it the pod stays in ImagePullBackOff.
 #   2. docker login on this machine (only if docker is installed). A failed login
 #      is only a warning, it does not change the result of the script.
-# Called by 02_install_cnpg_operator.sh when the secret is missing. Run it by hand
+# Called by 03_install_cnpg_operator.sh when the secret is missing. Run it by hand
 # after a change of the token: an existing secret is replaced.
 # Exit code: 0 = pull secret created, 1 = token not set or secret not created.
 

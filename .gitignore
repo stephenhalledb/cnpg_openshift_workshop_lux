@@ -1,3 +1,4 @@
 .credentials.sh
 pull_secret.txt
 pitr/restore-cluster.yaml
+credentials.sh

@@ -1,10 +1,10 @@
 #!/bin/bash
 # Scales the number of instances of the cluster (cluster_name in config.sh).
-#   ./15_scale.sh            : shows the current number of instances and asks for
+#   ./25_scale.sh            : shows the current number of instances and asks for
 #                              the new number
-#   ./15_scale.sh n          : scale to n instances
-#   ./15_scale.sh out [n]    : scale out to n instances (default: current + 1)
-#   ./15_scale.sh in [n]     : scale in to n instances (default: current - 1)
+#   ./25_scale.sh n          : scale to n instances
+#   ./25_scale.sh out [n]    : scale out to n instances (default: current + 1)
+#   ./25_scale.sh in [n]     : scale in to n instances (default: current - 1)
 . ./config.sh
 
 #Doc
@@ -52,7 +52,7 @@ ask_target() {
 
 current=$(current_instances)
 if [ -z "${current}" ]; then
-  print_error "Cluster ${cluster_name} not found in namespace ${namespace} (oc whoami? ./05_install_cluster.sh?).\n"
+  print_error "Cluster ${cluster_name} not found in namespace ${namespace} (oc whoami? ./10_install_cluster.sh?).\n"
   exit 1
 fi
 

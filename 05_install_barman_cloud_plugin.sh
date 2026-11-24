@@ -7,7 +7,7 @@ echo "03b" > ./docs/docid
 # Barman Cloud Plugin (CNPG-I plugin): backups and WAL archiving of the clusters
 # go through it (ObjectStore resource + spec.plugins in the Cluster).
 # Requirements: cert-manager, and the plugin must run in the namespace of the
-# operator (openshift-operators with the OLM install of 02_install_cnpg_operator.sh).
+# operator (openshift-operators with the OLM install of 03_install_cnpg_operator.sh).
 # The release manifest is made for cnpg-system, so its namespace is replaced.
 # It also pins runAsUser/runAsGroup 10001, which the OpenShift restricted-v2 SCC
 # rejects (the UID must be in the range of the namespace): those two lines are removed.

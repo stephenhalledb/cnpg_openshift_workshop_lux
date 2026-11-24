@@ -22,7 +22,7 @@ export openshift_installed_locally="yes"
 
 # --- Object storage for backups and WALs -------------------------------------
 # Type of S3 object storage [minio|aws]
-#   minio = MinIO on the OpenShift cluster (00_setup_S3_storage.sh checks/installs it)
+#   minio = MinIO on the OpenShift cluster (01_setup_S3_storage.sh checks/installs it)
 #   aws   = AWS S3, the credentials are read from the .aws.sh file (see README)
 export object_storage_type="minio"      # [minio|aws]
 export S3_bucket_name="backups"                 # S3 bucket name
@@ -41,11 +41,11 @@ export s3_endpoint_url="http://minio-service.minio-system.svc.cluster.local:9000
 # --- Who installs the prerequisites ------------------------------------------
 # Are MinIO, the kubectl-cnp plugin and the operator managed by an administrator? [yes|no]
 # yes = the administrator installs them before this repo is used:
-#       00_setup_S3_storage.sh, 01_install_plugin.sh and 02_install_cnpg_operator.sh
+#       01_setup_S3_storage.sh, 02_install_cnp_plugin.sh and 03_install_cnpg_operator.sh
 #       only check and print whether they are available (nothing is installed)
 #       and 99_delete_env.sh does NOT remove MinIO
-# no  = this repo installs them if they are missing (00_setup_S3_storage.sh, 01_install_plugin.sh 
-#       , 02_install_cnpg_operator.sh)
+# no  = this repo installs them if they are missing (01_setup_S3_storage.sh, 02_install_cnp_plugin.sh 
+#       , 03_install_cnpg_operator.sh)
 #       and 99_delete_env.sh removes MinIO (if object_storage_type is minio)
 # (if already installed, nothing is installed whatever the value)
 export plugin_operator_minio_managed_by_admin="no"
@@ -53,7 +53,7 @@ export plugin_operator_minio_managed_by_admin="no"
 # --- Monitoring --------------------------------------------------------------
 # Prometheus monitoring of the Postgres clusters with the OpenShift (CRC) monitoring stack [yes|no]
 # yes = openshift_crc/start_openshift.sh starts CRC with enable-cluster-monitoring=true,
-#       and monitoring/06_openshift_monitoring.sh (called by 05_install_cluster.sh)
+#       and monitoring/06_openshift_monitoring.sh (called by 10_install_cluster.sh)
 #       enables monitoring for user-defined projects and creates a PodMonitor
 #       for the Postgres clusters in ${namespace}
 # no  = start_openshift.sh starts CRC without cluster monitoring, and running
@@ -179,7 +179,7 @@ export s3_destination_path="s3://${S3_bucket_name}/"
 
 # --- Barman Cloud Plugin -----------------------------------------------------
 # Backups and WAL archiving of the clusters use the Barman Cloud Plugin
-# (installed by 03b_install_barman_cloud_plugin.sh, needs cert-manager).
+# (installed by 05_install_barman_cloud_plugin.sh, needs cert-manager).
 export barman_cloud_plugin_version="v0.16.0"
 export cert_manager_version="v1.21.3"
 export objectstore_name="${cluster_name}-objectstore"   # ObjectStore resource (bucket settings)

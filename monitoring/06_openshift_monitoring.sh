@@ -79,7 +79,7 @@ if [ "${enable_prometheus_monitoring}" == "yes" ]; then
   fi
 
   if ! ${kubectl_cmd} get namespace ${namespace} >/dev/null 2>&1; then
-    print_warning "Namespace ${namespace} does not exist yet, run ./04-prepare-cluster.sh first. PodMonitor not created.\n"
+    print_warning "Namespace ${namespace} does not exist yet, run ./06_prepare_cluster.sh first. PodMonitor not created.\n"
     exit 1
   fi
   print_command "oc apply -n ${namespace} PodMonitor postgres-clusters (selects label k8s.enterprisedb.io/cluster)\n"
